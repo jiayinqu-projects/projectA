@@ -5,8 +5,8 @@ account: jiayin-qu
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2215781
-bundleId: 3084958
+bundleId: 3088897
 url: https://jiayin-qu.shinyapps.io/projectA_Qu/
-when: 1588233730.06251
+when: 1588309203.95049
 asMultiple: FALSE
 asStatic: FALSE

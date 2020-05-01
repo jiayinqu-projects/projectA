@@ -6,9 +6,7 @@
   
 # Libraries
 library(tidyverse)
-library(ggplot2)
 library(twitteR)
-library(stringr)
 library(shiny)
 library(DT)
 library(tm)
@@ -54,18 +52,20 @@ saveRDS(dataset, "dataset.rds")
 
 # Data cleaning
 cleanData <- function(dbl){
+  dbl$text <- gsub("\\@[a-zA-Z]+", "", dbl$text)
   twitter_cp <- VCorpus(VectorSource(dbl$text))
   twitter_cp <- tm_map(twitter_cp, PlainTextDocument)
+  twitter_cp <- tm_map(twitter_cp, removeNumbers)
   twitter_cp <- tm_map(twitter_cp, content_transformer(replace_abbreviation))
   twitter_cp <- tm_map(twitter_cp, content_transformer(replace_contraction))
   twitter_cp <- tm_map(twitter_cp, content_transformer(str_to_lower))
   twitter_cp <- tm_map(twitter_cp, removePunctuation)
-  twitter_cp <- tm_map(twitter_cp, removeWords, c(stopwords(kind = "en"), stopwords(kind = "fr"), stopwords(kind = "es"), "sil", "quoi", "will"))
+  twitter_cp <- tm_map(twitter_cp, removeWords, c(stopwords(kind = "en"), stopwords(kind = "fr"), stopwords(kind = "es")))
   twitter_cp <- tm_map(twitter_cp, stripWhitespace)
   
-  twitter_cp <- lemmatize_words(twitter_cp)
+  twitter_cp <- tm_map(twitter_cp, content_transformer(lemmatize_strings))
   
-  twitter_dtm <- DocumentTermMatrix(twitter_cp, control = list(stopwords = c(stopwords(kind = "en"), stopwords(kind = "fr"), stopwords(kind = "es"), "sil", "quoi", "will")))
+  twitter_dtm <- DocumentTermMatrix(twitter_cp)
   twitter_dtm <- removeSparseTerms(twitter_dtm, .99)
   tokenCounts <- apply(twitter_dtm, 1, sum)
   twitter_dtm <- twitter_dtm[tokenCounts>0, ]
